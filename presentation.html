@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CleanCity Copilot — Alibaba Cloud AI Hackathon 2026</title>
+<style>
+  /* ── Reset & Base ─────────────────────────────────── */
+  *, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
+
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap');
+
+  :root {
+    --bg:        #F7F5F0;       /* warm parchment */
+    --surface:   #FFFFFF;
+    --ink:       #1A1A1A;
+    --ink-soft:  #4A4A4A;
+    --ink-muted: #7A7A7A;
+    --accent:    #1B4965;       /* deep steel blue */
+    --accent-lt: #E8EEF2;
+    --teal:      #0A6E5C;       /* forest teal */
+    --terra:     #C44536;       /* terracotta red */
+    --amber:     #B5830A;
+    --border:    #DDD8D0;
+    --radius:    10px;
+    --font:      'Inter', -apple-system, 'Segoe UI', sans-serif;
+    --serif:     'Source Serif 4', 'Georgia', serif;
+  }
+
+  html, body {
+    width: 100%; height: 100%;
+    overflow: hidden;
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--ink);
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Slide Container ──────────────────────────────── */
+  .deck {
+    position: relative;
+    width: 100vw; height: 100vh;
+  }
+
+  .slide {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 5vh 8vw;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+  }
+  .slide.active {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* ── Typography ───────────────────────────────────── */
+  .slide h1 {
+    font-family: var(--serif);
+    font-weight: 700;
+    font-size: clamp(2.2rem, 4.5vw, 3.6rem);
+    line-height: 1.15;
+    color: var(--ink);
+    text-align: center;
+    margin-bottom: 0.4em;
+    letter-spacing: -0.02em;
+  }
+  .slide h2 {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: clamp(1.6rem, 3vw, 2.4rem);
+    line-height: 1.2;
+    color: var(--ink);
+    margin-bottom: 0.5em;
+    letter-spacing: -0.01em;
+  }
+  .slide h3 {
+    font-weight: 600;
+    font-size: clamp(1rem, 1.6vw, 1.25rem);
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    margin-bottom: 0.8em;
+  }
+  .slide p, .slide li {
+    font-size: clamp(0.95rem, 1.4vw, 1.15rem);
+    line-height: 1.7;
+    color: var(--ink-soft);
+    max-width: 52em;
+  }
+  .slide .subtitle {
+    font-size: clamp(1rem, 1.6vw, 1.3rem);
+    color: var(--ink-muted);
+    text-align: center;
+    margin-bottom: 1.5em;
+  }
+
+  .accent   { color: var(--accent); }
+  .teal     { color: var(--teal); }
+  .terra    { color: var(--terra); font-weight: 600; }
+  .amber    { color: var(--amber); }
+  .bold     { font-weight: 700; }
+  .serif    { font-family: var(--serif); }
+
+  /* ── Layouts ──────────────────────────────────────── */
+  .content-left {
+    align-items: flex-start;
+    text-align: left;
+    padding-left: 10vw;
+    padding-right: 10vw;
+  }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4vw;
+    width: 100%;
+    max-width: 1200px;
+    align-items: start;
+  }
+
+  .three-col {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 2.5vw;
+    width: 100%;
+    max-width: 1200px;
+  }
+
+  /* ── Cards ────────────────────────────────────────── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 2rem 1.8rem;
+  }
+  .card h4 {
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 0.6em;
+    color: var(--ink);
+  }
+  .card p, .card li {
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    line-height: 1.65;
+  }
+  .card-accent {
+    border-left: 3px solid var(--accent);
+  }
+  .card-teal {
+    border-left: 3px solid var(--teal);
+  }
+  .card-terra {
+    border-left: 3px solid var(--terra);
+  }
+
+  /* ── Stat Blocks ──────────────────────────────────── */
+  .stat {
+    text-align: center;
+    padding: 1.5rem;
+  }
+  .stat .number {
+    font-family: var(--serif);
+    font-size: clamp(2.5rem, 5vw, 4rem);
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 0.2em;
+  }
+  .stat .label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--ink-muted);
+    font-weight: 500;
+  }
+
+  /* ── Speaker Tag ──────────────────────────────────── */
+  .speaker-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+    background: var(--accent-lt);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 0.4em 1.2em;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+    margin-bottom: 1.5em;
+  }
+  .speaker-tag .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--accent);
+  }
+
+  /* ── Lists ────────────────────────────────────────── */
+  .clean-list {
+    list-style: none;
+    padding: 0;
+  }
+  .clean-list li {
+    position: relative;
+    padding-left: 1.5em;
+    margin-bottom: 0.8em;
+  }
+  .clean-list li::before {
+    content: '';
+    position: absolute;
+    left: 0; top: 0.6em;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    opacity: 0.5;
+  }
+
+  /* ── Flow Diagram (CSS only) ──────────────────────── */
+  .flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    width: 100%;
+    max-width: 1100px;
+    margin: 1.5em 0;
+  }
+  .flow-step {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.4rem 1.2rem;
+    text-align: center;
+  }
+  .flow-step .step-num {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--ink-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 0.4em;
+  }
+  .flow-step .step-title {
+    font-family: var(--serif);
+    font-weight: 600;
+    font-size: 1rem;
+    color: var(--ink);
+    margin-bottom: 0.3em;
+  }
+  .flow-step .step-desc {
+    font-size: 0.8rem;
+    color: var(--ink-muted);
+    line-height: 1.5;
+  }
+  .flow-arrow {
+    font-size: 1.4rem;
+    color: var(--border);
+    padding: 0 0.5em;
+    flex-shrink: 0;
+  }
+
+  /* ── Formula Box ──────────────────────────────────── */
+  .formula-box {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 1.8rem 2.5rem;
+    text-align: center;
+    margin: 1.2em 0;
+    font-family: 'Georgia', var(--serif);
+    font-size: clamp(1rem, 1.8vw, 1.3rem);
+    color: var(--ink);
+    letter-spacing: 0.02em;
+    line-height: 2;
+  }
+
+  /* ── Divider ──────────────────────────────────────── */
+  .divider {
+    width: 60px;
+    height: 3px;
+    background: var(--accent);
+    border-radius: 2px;
+    margin: 1em 0 1.5em 0;
+    opacity: 0.6;
+  }
+  .divider-center {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* ── Title Slide Specific ─────────────────────────── */
+  .title-slide h1 {
+    font-size: clamp(2.8rem, 5.5vw, 4.2rem);
+    margin-bottom: 0.15em;
+  }
+  .title-meta {
+    font-size: 0.85rem;
+    color: var(--ink-muted);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 2.5em;
+    text-align: center;
+  }
+  .team-names {
+    display: flex;
+    gap: 2.5em;
+    justify-content: center;
+    margin-top: 1em;
+    flex-wrap: wrap;
+  }
+  .team-names span {
+    font-size: 0.95rem;
+    color: var(--ink-soft);
+    font-weight: 500;
+  }
+
+  /* ── Closing CTA Slide ────────────────────────────── */
+  .cta-slide h1 {
+    font-size: clamp(2.4rem, 5vw, 3.8rem);
+    margin-bottom: 0.3em;
+  }
+
+  /* ── Tech Pill ────────────────────────────────────── */
+  .tech-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6em;
+    justify-content: center;
+    margin: 1em 0;
+  }
+  .pill {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 0.45em 1.1em;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: var(--ink-soft);
+  }
+
+  /* ── Map preview placeholder ──────────────────────── */
+  .map-preview {
+    width: 100%;
+    max-width: 700px;
+    aspect-ratio: 16/9;
+    background:
+      linear-gradient(135deg, #e8eef2 0%, #f0ece4 100%);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.6em;
+    color: var(--ink-muted);
+    font-size: 0.9rem;
+  }
+  .map-preview .map-icon {
+    font-size: 2.5rem;
+    opacity: 0.4;
+  }
+
+  /* ── Navigation ───────────────────────────────────── */
+  .nav-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0; right: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8rem 2rem;
+    background: rgba(247,245,240,0.92);
+    backdrop-filter: blur(8px);
+    border-top: 1px solid var(--border);
+    z-index: 100;
+    font-size: 0.78rem;
+    color: var(--ink-muted);
+  }
+  .nav-bar .dots {
+    display: flex;
+    gap: 6px;
+  }
+  .nav-bar .dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: var(--border);
+    cursor: pointer;
+    transition: all 0.25s;
+  }
+  .nav-bar .dot.active {
+    background: var(--accent);
+    width: 22px;
+    border-radius: 4px;
+  }
+  .nav-btn {
+    background: none;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 0.35em 1em;
+    font-family: var(--font);
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .nav-btn:hover {
+    background: var(--surface);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ── Dark Slide Variant ───────────────────────────── */
+  .dark-slide {
+    background: var(--accent);
+  }
+  .dark-slide h1, .dark-slide h2, .dark-slide h3,
+  .dark-slide p, .dark-slide li, .dark-slide .subtitle {
+    color: #FFFFFF;
+  }
+  .dark-slide h3 { color: rgba(255,255,255,0.6); }
+  .dark-slide p, .dark-slide li { color: rgba(255,255,255,0.82); }
+  .dark-slide .divider { background: rgba(255,255,255,0.3); }
+  .dark-slide .speaker-tag {
+    background: rgba(255,255,255,0.12);
+    border-color: rgba(255,255,255,0.2);
+    color: #fff;
+  }
+  .dark-slide .speaker-tag .dot { background: #fff; }
+
+  /* ── Responsive ───────────────────────────────────── */
+  @media (max-width: 900px) {
+    .two-col, .three-col { grid-template-columns: 1fr; }
+    .flow { flex-direction: column; }
+    .flow-arrow { transform: rotate(90deg); }
+    .slide { padding: 4vh 5vw; }
+  }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 1 — TITLE
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="slide title-slide active" data-index="0">
+  <h3>Alibaba Cloud AI Hackathon 2026</h3>
+  <h1>CleanCity Copilot</h1>
+  <p class="subtitle">
+    AI-Powered Municipal Intelligence for the Cities of Pakistan
+  </p>
+  <div class="divider divider-center"></div>
+  <div class="team-names">
+    <span><strong>Syed Fazeel Ahmed</strong> · AI Architect</span>
+    <span><strong>Muhammad Mir</strong> · Frontend Lead</span>
+    <span><strong>Abdul Latif</strong> · Backend & Spatial Systems</span>
+  </div>
+  <div class="title-meta">Hyderabad, Sindh</div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 2 — THE PROBLEM (Fazeel)
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="slide content-left" data-index="1">
+  <div class="speaker-tag"><span class="dot"></span> Syed Fazeel Ahmed — AI Architect</div>
+  <h2>The Unstructured Data Crisis</h2>
+  <div class="divider"></div>
+  <p style="max-width:44em; margin-bottom:1.8em;">
+    In cities like Hyderabad, citizens walk past overflowing garbage, hazardous potholes, and broken sewerage lines every day. When they try to report, the friction is immense — clunky apps, complex forms, unresponsive helplines.
+  </p>
+  <div class="three-col" style="max-width:1000px;">
+    <div class="card card-terra">
+      <h4>Chaotic Input</h4>
+      <p>Reports arrive as duplicates, vague descriptions, and miscategorized emergencies.</p>
+    </div>
+    <div class="card card-terra">
+      <h4>Manual Triage</h4>
+      <p>Overwhelmed clerks sort hundreds of complaints by hand, delaying response by days.</p>
+    </div>
+    <div class="card card-terra">
+      <h4>Paralyzed Response</h4>
+      <p>Duplicate work orders waste field crews, fuel, and municipal budgets every week.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 3 — OUR SOLUTION / ARCHITECTURE (Fazeel)
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" data-index="2">
+  <div class="speaker-tag"><span class="dot"></span> Syed Fazeel Ahmed — AI Architect</div>
+  <h2>One Unified Municipal Nervous System</h2>
+  <p class="subtitle" style="margin-bottom:1.2em;">Zero friction on the edge. Absolute intelligence in the core.</p>
+  <div class="divider divider-center"></div>
+  <div class="flow">
+    <div class="flow-step" style="border-top: 3px solid var(--teal);">
+      <div class="step-num">Edge</div>
+      <div class="step-title">Citizen Portal</div>
+      <div class="step-desc">Zero-install web app.<br>Photo + GPS + Voice in 15 sec.</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-top: 3px solid var(--accent);">
+      <div class="step-num">Core</div>
+      <div class="step-title">AI Pipeline</div>
+      <div class="step-desc">Gemini Vision + Whisper STT.<br>Auto-categorize & triage.</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-top: 3px solid var(--accent);">
+      <div class="step-num">Intelligence</div>
+      <div class="step-title">Geo-Dedup Engine</div>
+      <div class="step-desc">Haversine 50m radius.<br>Eliminate duplicate dispatches.</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="border-top: 3px solid var(--amber);">
+      <div class="step-num">Output</div>
+      <div class="step-title">Command Center</div>
+      <div class="step-desc">Live GIS map, KPIs, and<br>municipal task queue.</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 4 — MULTIMODAL AI PIPELINE (Fazeel)
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="slide content-left" data-index="3">
+  <div class="speaker-tag"><span class="dot"></span> Syed Fazeel Ahmed — AI Architect</div>
+  <h2>Multimodal AI Pipeline</h2>
+  <div class="divider"></div>
+  <p style="margin-bottom:1.8em; max-width:46em;">
+    Instead of humans manually reading, sorting, and verifying reports, our pipeline ingests
+    raw unstructured field data and transforms it into <strong>structured, actionable municipal intelligence</strong>.
+  </p>
+  <div class="two-col" style="max-width:1000px;">
+    <div class="card card-accent">
+      <h4>Gemini Vision LLM</h4>
+      <ul class="clean-list">
+        <li>Analyzes photo evidence semantically</li>
+        <li>Auto-classifies: Garbage / Pothole / Sewerage</li>
+        <li>Assigns severity: Low → Critical</li>
+        <li>Generates step-by-step field crew action plan</li>
+      </ul>
+    </div>
+    <div class="card card-teal">
+      <h4>Whisper Speech-to-Text</h4>
+      <ul class="clean-list">
+        <li>Citizens speak in Urdu or Sindhi — no typing</li>
+        <li>Transcribes local dialect audio in real time</li>
+        <li>Translates into standardized municipal records</li>
+        <li>Extracts key entities (location, urgency, type)</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 5 — CITIZEN PORTAL (Mir)
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="slide content-left" data-index="4">
+  <div class="speaker-tag"><span class="dot"></span> Muhammad Mir — Frontend Lead</div>
+  <h2>Zero-Friction Citizen Reporting</h2>
+  <div class="divider"></div>
+  <p style="margin-bottom:1.6em; max-width:46em;">
+    No downloads, no mandatory logins. A citizen in Latifabad stands in front of a collapsed road
+    and completes a full multimodal report in <strong>under 15 seconds</strong>.
+  </p>
+  <div class="three-col" style="max-width:1000px;">
+    <div class="card" style="text-align:center; border-top:3px solid var(--terra);">
+      <div style="font-size:2.2rem; margin-bottom:0.4em;">📷</div>
+      <h4>Visual Evidence</h4>
+      <p>Snap a photo. Frontend optimizes the image buffer before transmission.</p>
+    </div>
+    <div class="card" style="text-align:center; border-top:3px solid var(--accent);">
+      <div style="font-size:2.2rem; margin-bottom:0.4em;">📍</div>
+      <h4>Spatial Telemetry</h4>
+      <p>HTML5 Geolocation API extracts high-precision lat/lng directly from the device GPS.</p>
+    </div>
+    <div class="card" style="text-align:center; border-top:3px solid var(--teal);">
+      <div style="font-size:2.2rem; margin-bottom:0.4em;">🎙️</div>
+      <h4>Voice Notes</h4>
+      <p>Web Audio API captures raw voice in Urdu or Sindhi — no typing required.</p>
+    </div>
+  </div>
+  <p style="margin-top:1.4em; font-size:0.9rem; color:var(--ink-muted);">
+    All three streams are packaged into a single <code style="background:var(--accent-lt); padding:0.15em 0.5em; border-radius:4px;">multipart/form-data</code> payload and sent asynchronously.
+  </p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 6 — PAYLOAD ENGINEERING (Mir)
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" data-index="5">
+  <div class="speaker-tag"><span class="dot"></span> Muhammad Mir — Frontend Lead</div>
+  <h2>From Edge to Core — In Under a Second</h2>
+  <p class="subtitle" style="margin-bottom:1.2em;">The complete lifecycle of a citizen report submission.</p>
+  <div class="divider divider-center"></div>
+  <div class="flow">
+    <div class="flow-step">
+      <div class="step-num">1</div>
+      <div class="step-title">Capture</div>
+      <div class="step-desc">Photo + GPS + Audio<br>from citizen's device</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="step-num">2</div>
+      <div class="step-title">Validate</div>
+      <div class="step-desc">MIME check, size limit,<br>coordinate boundaries</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="step-num">3</div>
+      <div class="step-title">AI Analyze</div>
+      <div class="step-desc">Vision + STT classify,<br>severity-score, action plan</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="step-num">4</div>
+      <div class="step-title">Dedup</div>
+      <div class="step-desc">50m Haversine radius<br>merges duplicate reports</div>
+    </div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">
+      <div class="step-num">5</div>
+      <div class="step-title">Route</div>
+      <div class="step-desc">Ticket dispatched to<br>Municipal Command Center</div>
+    </div>
+  </div>
+  <p style="margin-top:1.8em; text-align:center; color:var(--ink-muted); font-size:0.9rem;">
+    Average total processing time: <strong style="color:var(--teal);">&lt; 800ms</strong> end-to-end
+  </p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 7 — GEO-DEDUPLICATION ENGINE (Latif)
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="slide dark-slide" data-index="6">
+  <div class="speaker-tag"><span class="dot"></span> Abdul Latif — Backend & Spatial Systems</div>
+  <h2>The Haversine Geo-Deduplication Engine</h2>
+  <p class="subtitle" style="max-width:40em;">
+    Our core technical differentiator. When 10 people report the same pothole near Haider Chowk
+    within two days, we create exactly <strong>one</strong> ticket — not ten.
+  </p>
+  <div class="divider divider-center"></div>
+  <div class="formula-box" style="background:rgba(255,255,255,0.08); border-color:rgba(255,255,255,0.15); color:#fff;">
+    Δσ = 2 · arcsin &radic;( sin²(Δφ/2) + cos φ₁ · cos φ₂ · sin²(Δλ/2) )
+  </div>
+  <div style="display:flex; gap:3em; margin-top:1.5em; flex-wrap:wrap; justify-content:center;">
+    <div class="stat">
+      <div class="number" style="color:#5EC4B6;">50m</div>
+      <div class="label" style="color:rgba(255,255,255,0.5);">Perimeter Radius</div>
+    </div>
+    <div class="stat">
+      <div class="number" style="color:#5EC4B6;">48hr</div>
+      <div class="label" style="color:rgba(255,255,255,0.5);">Temporal Window</div>
+    </div>
+    <div class="stat">
+      <div class="number" style="color:#5EC4B6;">~70%</div>
+      <div class="label" style="color:rgba(255,255,255,0.5);">Duplicates Eliminated</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 8 — BACKEND ARCHITECTURE (Latif)
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="slide content-left" data-index="7">
+  <div class="speaker-tag"><span class="dot"></span> Abdul Latif — Backend & Spatial Systems</div>
+  <h2>Production-Grade Backend</h2>
+  <div class="divider"></div>
+  <div class="two-col" style="max-width:1000px;">
+    <div>
+      <ul class="clean-list">
+        <li><strong>FastAPI</strong> — async-first Python framework with automatic OpenAPI docs</li>
+        <li><strong>SQLAlchemy ORM</strong> with SQLite Write-Ahead Logging for concurrent writes</li>
+        <li><strong>Smart Hyderabad Geocoding</strong> — text addresses map to known coordinates automatically</li>
+        <li><strong>Rate Limiting</strong> via SlowAPI to prevent abuse under high load</li>
+      </ul>
+    </div>
+    <div>
+      <ul class="clean-list">
+        <li><strong>12 real Hyderabad landmarks</strong> seeded with authentic GPS coordinates</li>
+        <li><strong>CORS-secured</strong> communication between Streamlit frontend and FastAPI backend</li>
+        <li><strong>Dual coordinate support</strong> — accepts both <code>lat/lng</code> and <code>latitude/longitude</code> formats</li>
+        <li><strong>Automated test suite</strong> — 16/16 integration tests passing</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 9 — MUNICIPAL COMMAND CENTER (Latif)
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" data-index="8">
+  <div class="speaker-tag"><span class="dot"></span> Abdul Latif — Backend & Spatial Systems</div>
+  <h2>Live Municipal Command Center</h2>
+  <p class="subtitle" style="max-width:42em;">
+    Real-time GIS visualization across 12 critical zones of Hyderabad, Sindh — powered by Leaflet and OpenStreetMap.
+  </p>
+  <div class="divider divider-center"></div>
+  <div class="three-col" style="max-width:1000px; margin-top:0.5em;">
+    <div class="card" style="text-align:center;">
+      <div style="font-size:2rem; margin-bottom:0.3em;">🗺️</div>
+      <h4>Real Street Map</h4>
+      <p>Authentic Hyderabad map — not a mockup. Color-coded pins by severity.</p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div style="font-size:2rem; margin-bottom:0.3em;">⭕</div>
+      <h4>Dedup Perimeters</h4>
+      <p>50m dashed circles on real streets visualize active deduplication zones.</p>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div style="font-size:2rem; margin-bottom:0.3em;">📊</div>
+      <h4>Live KPIs</h4>
+      <p>"Resolved Today" counter updates in real-time as field crews close tickets.</p>
+    </div>
+  </div>
+  <p style="margin-top:1.8em; text-align:center; font-size:0.9rem; color:var(--ink-muted);">
+    <strong>LIVE DEMO →</strong>&nbsp; Open <code style="background:var(--accent-lt); padding:0.15em 0.5em; border-radius:4px;">http://127.0.0.1:8000</code> to see it running
+  </p>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 10 — IMPACT & SCALE
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" data-index="9">
+  <h3>Impact</h3>
+  <h2>Why This Matters</h2>
+  <div class="divider divider-center"></div>
+  <div style="display:flex; gap:3.5em; margin:1.5em 0 2em; flex-wrap:wrap; justify-content:center;">
+    <div class="stat">
+      <div class="number accent">~70%</div>
+      <div class="label">Fewer Duplicate Dispatches</div>
+    </div>
+    <div class="stat">
+      <div class="number teal">15 sec</div>
+      <div class="label">Citizen Report Time</div>
+    </div>
+    <div class="stat">
+      <div class="number amber">&lt;800ms</div>
+      <div class="label">End-to-End Processing</div>
+    </div>
+    <div class="stat">
+      <div class="number terra">0</div>
+      <div class="label">Manual Data Entry Needed</div>
+    </div>
+  </div>
+  <div class="two-col" style="max-width:900px;">
+    <div class="card card-accent">
+      <h4>Municipal Cost Savings</h4>
+      <p>Eliminates redundant field crew dispatches, reduces fuel costs, and removes the need for large human call centers and manual data-entry clerks.</p>
+    </div>
+    <div class="card card-teal">
+      <h4>Scalable Across Sindh</h4>
+      <p>Lightweight, stateless API architecture. Deploy across any district or cantonment board. Migrate to Alibaba Cloud ApsaraDB + ACK Kubernetes for province-wide scale.</p>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 11 — TECH STACK
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="slide" data-index="10">
+  <h3>Under the Hood</h3>
+  <h2>Technology Stack</h2>
+  <div class="divider divider-center"></div>
+  <div class="two-col" style="max-width:900px; margin-top:1em;">
+    <div>
+      <h4 style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--ink-muted); margin-bottom:0.8em;">Frontend & Citizen Interface</h4>
+      <div class="tech-pills" style="justify-content:flex-start;">
+        <span class="pill">Streamlit</span>
+        <span class="pill">HTML5 Geolocation</span>
+        <span class="pill">Web Audio API</span>
+        <span class="pill">Responsive CSS</span>
+      </div>
+      <h4 style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--ink-muted); margin:1.5em 0 0.8em;">AI & Intelligence</h4>
+      <div class="tech-pills" style="justify-content:flex-start;">
+        <span class="pill">Gemini Vision LLM</span>
+        <span class="pill">Whisper STT</span>
+        <span class="pill">Haversine Algorithm</span>
+      </div>
+    </div>
+    <div>
+      <h4 style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--ink-muted); margin-bottom:0.8em;">Backend & Data</h4>
+      <div class="tech-pills" style="justify-content:flex-start;">
+        <span class="pill">Python 3.14</span>
+        <span class="pill">FastAPI</span>
+        <span class="pill">SQLAlchemy ORM</span>
+        <span class="pill">SQLite WAL</span>
+        <span class="pill">Pydantic</span>
+      </div>
+      <h4 style="font-size:0.8rem; text-transform:uppercase; letter-spacing:0.12em; color:var(--ink-muted); margin:1.5em 0 0.8em;">Visualization & DevOps</h4>
+      <div class="tech-pills" style="justify-content:flex-start;">
+        <span class="pill">Leaflet.js</span>
+        <span class="pill">OpenStreetMap</span>
+        <span class="pill">Pytest (16/16)</span>
+        <span class="pill">CORS + Rate Limiting</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════════════════════════
+     SLIDE 12 — CLOSING
+     ═══════════════════════════════════════════════════════════════ -->
+<div class="slide dark-slide cta-slide" data-index="11">
+  <h1>Cleaner Cities.<br>Smarter Government.</h1>
+  <p class="subtitle" style="max-width:36em; margin-bottom:2em;">
+    CleanCity Copilot transforms chaotic citizen voices into structured, geo-verified,
+    AI-triaged municipal action — in real time.
+  </p>
+  <div class="divider divider-center" style="background:rgba(255,255,255,0.3);"></div>
+  <div class="team-names" style="margin-top:1.5em;">
+    <span style="color:rgba(255,255,255,0.85);"><strong>Syed Fazeel Ahmed</strong></span>
+    <span style="color:rgba(255,255,255,0.85);"><strong>Muhammad Mir</strong></span>
+    <span style="color:rgba(255,255,255,0.85);"><strong>Abdul Latif</strong></span>
+  </div>
+  <p style="margin-top:2.5em; font-size:1rem; color:rgba(255,255,255,0.6); letter-spacing:0.06em;">
+    Thank you — we welcome your questions.
+  </p>
+</div>
+
+</div><!-- /deck -->
+
+
+<!-- ── Navigation Bar ──────────────────────────────── -->
+<div class="nav-bar">
+  <button class="nav-btn" onclick="go(-1)">← Previous</button>
+  <div class="dots" id="dots"></div>
+  <button class="nav-btn" onclick="go(1)">Next →</button>
+</div>
+
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const dotsEl = document.getElementById('dots');
+  let current = 0;
+
+  // Build dots
+  slides.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.onclick = () => jump(i);
+    dotsEl.appendChild(d);
+  });
+
+  function jump(index) {
+    if (index < 0 || index >= slides.length) return;
+    slides[current].classList.remove('active');
+    dotsEl.children[current].classList.remove('active');
+    current = index;
+    slides[current].classList.add('active');
+    dotsEl.children[current].classList.add('active');
+  }
+
+  function go(dir) { jump(current + dir); }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'PageDown') { e.preventDefault(); go(1); }
+    if (e.key === 'ArrowLeft' || e.key === 'PageUp')  { e.preventDefault(); go(-1); }
+    if (e.key === 'Home') { e.preventDefault(); jump(0); }
+    if (e.key === 'End')  { e.preventDefault(); jump(slides.length - 1); }
+  });
+
+  // Touch swipe support
+  let touchX = 0;
+  document.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; });
+  document.addEventListener('touchend', e => {
+    const diff = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(diff) > 50) go(diff < 0 ? 1 : -1);
+  });
+</script>
+
+</body>
+</html>

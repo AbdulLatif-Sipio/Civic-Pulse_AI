@@ -1,0 +1,95 @@
+
+===========================================================================
+TIMESTAMP: 2026-10-23T09:14:09.694755+00:00
+TICKET:    TKT-TEST01 [Critical] (Sewerage)
+RECIPIENT: Engr. Farhan Mughal (Chairman, Municipal Committee Qasimabad)
+EMAIL:     chairman.qasimabad@hmc.sindh.gov.pk (Distance: ~0.0 km)
+LOCATION:  Naseem Nagar Chowk, Qasimabad (25.395000, 68.332000)
+STATUS:    DELIVERED_SIMULATED_LEDGER
+---------------------------------------------------------------------------
+================================================================================
+🚨 SINDH MUNICIPAL SERVICES — CRITICAL CIVIC EMERGENCY ALERT 🚨
+================================================================================
+PRIORITY LEVEL: CRITICAL (IMMEDIATE FIELD DISPATCH REQUIRED WITHIN 2 HOURS)
+
+ATTENTION:
+  To:          Engr. Farhan Mughal
+  Designation: Chairman, Municipal Committee Qasimabad
+  Zonal Office: Qasimabad Municipal Committee (Hyderabad)
+  Proximity:   ~0.0 km from reported hazard location
+
+INCIDENT SUMMARY:
+  Ticket ID:        TKT-TEST01
+  Hazard Category:  Sewerage
+  Assessed Severity: CRITICAL 🚨
+  Location:         Naseem Nagar Chowk, Qasimabad
+  GPS Coordinates:  25.395000° N, 68.332000° E
+  Navigation Link:  https://www.google.com/maps?q=25.395000,68.332000
+  Citizen Phone:    0300-1234567
+  Logged At:        23-Oct-2026 09:14:09 UTC
+
+CITIZEN REPORT / AUDIO TRANSCRIPTION:
+--------------------------------------------------------------------------------
+Open gutter overflowing with black water near hospital.
+
+AI-GENERATED RAPID-RESPONSE ACTION PLAN:
+--------------------------------------------------------------------------------
+Deploy suction jetting tanker and WASA team.
+
+PROTOCOL DIRECTIVE:
+Under Sindh Emergency Municipal Service SOPs, this hazard poses direct risks to
+public safety or essential infrastructure. Your zonal rapid-response unit is
+hereby dispatched to inspect and secure the perimeter immediately.
+
+CleanCity Copilot Automated Dispatch System
+Municipal Grievance Cell: 1339 | Emergency Rescue: 1122
+================================================================================
+
+===========================================================================
+TIMESTAMP: 2026-10-23T09:15:38.609718+00:00
+TICKET:    TKT-TEST01 [Critical] (Sewerage)
+RECIPIENT: Engr. Farhan Mughal (Chairman, Municipal Committee Qasimabad)
+EMAIL:     chairman.qasimabad@hmc.sindh.gov.pk (Distance: ~0.0 km)
+LOCATION:  Naseem Nagar Chowk, Qasimabad (25.395000, 68.332000)
+STATUS:    DELIVERED_SIMULATED_LEDGER
+---------------------------------------------------------------------------
+================================================================================
+🚨 SINDH MUNICIPAL SERVICES — CRITICAL CIVIC EMERGENCY ALERT 🚨
+================================================================================
+PRIORITY LEVEL: CRITICAL (IMMEDIATE FIELD DISPATCH REQUIRED WITHIN 2 HOURS)
+
+ATTENTION:
+  To:          Engr. Farhan Mughal
+  Designation: Chairman, Municipal Committee Qasimabad
+  Zonal Office: Qasimabad Municipal Committee (Hyderabad)
+  Proximity:   ~0.0 km from reported hazard location
+
+INCIDENT SUMMARY:
+  Ticket ID:        TKT-TEST01
+  Hazard Category:  Sewerage
+  Assessed Severity: CRITICAL 🚨
+  Location:         Naseem Nagar Chowk, Qasimabad
+  GPS Coordinates:  25.395000° N, 68.332000° E
+  Navigation Link:  https://www.google.com/maps?q=25.395000,68.332000
+  Citizen Phone:    0300-1234567
+  Logged At:        23-Oct-2026 09:15:38 UTC
+
+CITIZEN REPORT / AUDIO TRANSCRIPTION:
+--------------------------------------------------------------------------------
+Open gutter overflowing with black water near hospital.
+
+AI-GENERATED RAPID-RESPONSE ACTION PLAN:
+--------------------------------------------------------------------------------
+Deploy suction jetting tanker and WASA team.
+
+PROTOCOL DIRECTIVE:
+Under Sindh Emergency Municipal Service SOPs, this hazard poses direct risks to
+public safety or essential infrastructure. Your zonal rapid-response unit is
+hereby dispatched to inspect and secure the perimeter immediately.
+
+CleanCity Copilot Automated Dispatch System
+Municipal Grievance Cell: 1339 | Emergency Rescue: 1122
+================================================================================
+[2026-10-23T11:03:27.182898+00:00] DISPATCH -> chairman.saddar@kmc.sindh.gov.pk (Syed Mansoor Ali) | TICKET: TKT-D5D194 | HAZARD: Pothole (Critical) | DIST: 2.53km | ADDR: 24.8615° N, 67.0262° E
+[2026-10-23T11:03:28.201577+00:00] DISPATCH -> chairman.saddar@kmc.sindh.gov.pk (Syed Mansoor Ali) | TICKET: TKT-5381F5 | HAZARD: Pothole (Critical) | DIST: 3.09km | ADDR: 24.8700° N, 67.0300° E
+[2026-10-23T11:03:28.802227+00:00] DISPATCH -> eo.cantt@hmc.sindh.gov.pk (Kashif Ali Brohi) | TICKET: TKT-5E0B12 | HAZARD: Sewerage (Critical) | DIST: 0.0km | ADDR: 25.3910° N, 68.3620° E
