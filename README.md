@@ -3,8 +3,8 @@ title: CivicPulse AI - CleanCity Copilot
 emoji: 🏛️
 colorFrom: blue
 colorTo: green
-sdk: docker
-app_port: 8000
+sdk: streamlit
+app_file: streamlit_app.py
 pinned: false
 ---
 
