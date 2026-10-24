@@ -32,3 +32,7 @@ media/audio/*
 .idea/
 .DS_Store
 Thumbs.db
+
+# Deployment Archives
+cleancity_deploy.tar.gz
+cleancity_deploy.zip

@@ -1,0 +1,48 @@
+services:
+  # 1. CivicPulse Web Portal & Unified Backend API
+  - type: web
+    name: civicpulse-portal
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn master_backend:app --host 0.0.0.0 --port $PORT
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: APP_ENV
+        value: production
+      - key: DEBUG
+        value: false
+      - key: ADMIN_API_KEY
+        value: cleancity-admin-secret-key-2026
+      - key: FORCE_HTTPS
+        value: true
+      - key: CORS_ORIGINS
+        value: "*"
+      - key: AI_PROVIDER
+        value: mock
+
+  # 2. Streamlit Citizen & Admin UI
+  - type: web
+    name: civicpulse-streamlit
+    env: python
+    region: oregon
+    plan: free
+    buildCommand: pip install -r requirements.txt
+    startCommand: cd cleancity-frontend/cleancity-frontend && streamlit run app.py --server.port $PORT --server.address 0.0.0.0 --server.headless true --browser.gatherUsageStats false
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: ADMIN_API_KEY
+        value: cleancity-admin-secret-key-2026
+      - key: CLEANCITY_BACKEND_URL
+        fromService:
+          type: web
+          name: civicpulse-portal
+          property: host
+      - key: CIVICPULSE_BACKEND_URL
+        fromService:
+          type: web
+          name: civicpulse-portal
+          property: host

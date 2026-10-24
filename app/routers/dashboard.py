@@ -569,7 +569,7 @@ DASHBOARD_CLASSY_HTML = """
     </div>
 
     <script>
-        const ADMIN_KEY = "cleancity-admin-secret-key-2026";
+        // ADMIN_KEY removed from frontend (Item 4: Secrets off front end)
         let map, markersLayer, circlesLayer;
 
         // Center on Hyderabad, Sindh
@@ -766,10 +766,62 @@ DASHBOARD_CLASSY_HTML = """
 """
 
 
+from pydantic import BaseModel
+from typing import Optional, Dict, Any
+
+class AnalyticsEventPayload(BaseModel):
+    event: str
+    payload: Optional[Dict[str, Any]] = None
+    timestamp: Optional[float] = None
+
 @router.get("/", response_class=HTMLResponse)
 @router.get("/dashboard", response_class=HTMLResponse)
 async def get_dashboard():
-    """
-    Serves the natural, classy municipal dashboard with real Hyderabad map.
-    """
-    return DASHBOARD_CLASSY_HTML
+    import os
+    tpl = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "templates", "index.html")
+    if os.path.exists(tpl):
+        with open(tpl, "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    return HTMLResponse(content=DASHBOARD_CLASSY_HTML)
+
+@router.get("/privacy", response_class=HTMLResponse, tags=["Legal & Statutory"])
+async def privacy_page():
+    import os
+    tpl = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "templates", "privacy.html")
+    if os.path.exists(tpl):
+        with open(tpl, "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    return HTMLResponse(content="<h1>Privacy Policy</h1>")
+
+@router.get("/terms", response_class=HTMLResponse, tags=["Legal & Statutory"])
+async def terms_page():
+    import os
+    tpl = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "templates", "terms.html")
+    if os.path.exists(tpl):
+        with open(tpl, "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    return HTMLResponse(content="<h1>Terms and Conditions</h1>")
+
+@router.get("/robots.txt", response_class=HTMLResponse, tags=["SEO & Crawlers"])
+async def robots_txt():
+    import os
+    from fastapi.responses import PlainTextResponse
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "robots.txt")
+    if os.path.exists(path):
+        with open(path, "r", encoding="utf-8") as f:
+            return PlainTextResponse(content=f.read())
+    return PlainTextResponse("User-agent: *\nAllow: /\nDisallow: /media/\nDisallow: /api/\nSitemap: https://civicpulse.sindh.gov.pk/sitemap.xml\n")
+
+@router.get("/sitemap.xml", tags=["SEO & Crawlers"])
+async def sitemap_xml():
+    import os
+    from fastapi.responses import Response
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "..", "..", "sitemap.xml")
+    if os.path.exists(path):
+        with open(path, "r", encoding="utf-8") as f:
+            return Response(content=f.read(), media_type="application/xml")
+    raise HTTPException(status_code=404, detail="Sitemap not found")
+
+@router.post("/api/analytics/event", tags=["Telemetry"])
+async def record_analytics(data: AnalyticsEventPayload):
+    return {"status": "recorded", "event": data.event}

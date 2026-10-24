@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Allow: /dashboard
+Allow: /privacy
+Allow: /terms
+Disallow: /media/
+Disallow: /api/
+
+Sitemap: https://civicpulse.sindh.gov.pk/sitemap.xml

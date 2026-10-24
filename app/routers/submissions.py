@@ -57,6 +57,7 @@ HYDERABAD_LANDMARKS = {
 async def submit_report(
     request: Request,
     image: UploadFile = File(..., description="Civic issue image file (JPEG, PNG, WebP)"),
+    hp_website: Optional[str] = Form(None, description="Honeypot field for spam/bot protection"),
     audio: Optional[UploadFile] = File(None, description="Optional Urdu/Roman Urdu voice note (MP3, WAV, M4A, OGG)"),
     latitude: Optional[float] = Form(None, description="GPS Latitude (-90.0 to 90.0)"),
     longitude: Optional[float] = Form(None, description="GPS Longitude (-180.0 to 180.0)"),
@@ -67,6 +68,11 @@ async def submit_report(
     phone_number: Optional[str] = Form(None, description="Citizen Pakistan mobile number for SMS dispatch receipts"),
     db: Session = Depends(get_db)
 ):
+    # 0. Honeypot Spam / Bot Protection (Item 18)
+    if hp_website and hp_website.strip():
+        logger.warning(f"Spambot detected via honeypot: {hp_website}")
+        raise HTTPException(status_code=400, detail="Automated bot submission detected and rejected.")
+
     # 1. Resolve and Validate Coordinates (Support latitude/longitude or lat/lng or address geocode)
     resolved_lat: Optional[float] = latitude
     resolved_lon: Optional[float] = longitude

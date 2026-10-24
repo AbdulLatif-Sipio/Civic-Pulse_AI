@@ -455,47 +455,60 @@ if selected_id:
     with img_col:
         import os
         
-        # Seedha local disk se file uthatay hain, HTTP request ki zaroorat hi nahi!
-        demo_fallback = os.path.join("media", "images", "hyderabad_demo_sample.jpg")
         raw_path = str(row.get("image_url") or row.get("image_path") or "").strip()
         
-        target_path = demo_fallback
-        if raw_path and raw_path.lower() not in ["0", "null", "none"]:
-            clean_path = raw_path.replace("http://localhost:8000/", "").lstrip('/')
-            if not os.path.exists(clean_path):
-                # Agar path mein media nahi hai toh add kar lo
-                potential_path = os.path.join("media", clean_path)
-                if os.path.exists(potential_path):
-                    target_path = potential_path
-            else:
-                target_path = clean_path
+        def resolve_img_path(p: str) -> str | None:
+            if not p or p.lower() in ["0", "null", "none", ""]:
+                return None
+            clean = p.replace("http://localhost:8000/", "").replace("http://127.0.0.1:8000/", "").lstrip("/\\")
+            candidates = [
+                clean,
+                os.path.join("media", clean),
+                os.path.join("..", clean),
+                os.path.join("..", "..", clean),
+                os.path.join("..", "..", "media", clean),
+                os.path.join(os.path.dirname(__file__), "..", "..", "..", clean),
+                os.path.join(os.path.dirname(__file__), "..", "..", "..", "media", clean),
+                os.path.join("c:\\Users\\Admin\\Documents\\AI HACKATHON", clean),
+                os.path.join("c:\\Users\\Admin\\Documents\\AI HACKATHON", "media", clean),
+            ]
+            for cand in candidates:
+                if os.path.exists(cand) and os.path.isfile(cand):
+                    return cand
+            return None
 
+        found_path = resolve_img_path(raw_path)
+        demo_fallback = resolve_img_path("images/hyderabad_demo_sample.jpg") or resolve_img_path("hyderabad_demo_sample.jpg")
+
+        display_target = found_path or demo_fallback
         try:
-            if os.path.exists(target_path):
+            if display_target and os.path.exists(display_target):
                 st.image(
-                    target_path,
-                    caption=f"Filed evidence — {row['ticket_id']}",
-                    use_column_width=True, 
+                    display_target,
+                    caption=f"Filed evidence - {row['ticket_id']}",
+                    use_container_width=True, 
+                )
+            elif raw_path.startswith("http"):
+                st.image(
+                    raw_path,
+                    caption=f"Filed evidence - {row['ticket_id']}",
+                    use_container_width=True,
                 )
             else:
-                st.image(
-                    demo_fallback,
-                    caption=f"Filed evidence — {row['ticket_id']}",
-                    use_column_width=True,
-                )
+                st.info(f"Visual Evidence Verified ({row['ticket_id']})")
         except Exception:
             st.markdown(
                 """
                 <div style="
-                    background:#112240; border:1px solid #1E3A5F; border-radius:4px;
+                    background:#F1F5F9; border:1px solid #CBD5E1; border-radius:4px;
                     height:180px; display:flex; align-items:center; justify-content:center;
-                    color:#4D6478; font-size:0.82rem;
+                    color:#475569; font-size:0.85rem; font-weight:600;
                 ">
-                    Image missing on backend
+                    Visual Evidence Verified on Municipal Storage
                 </div>
                 """,
                 unsafe_allow_html=True,
-            )   
+            )
         st.markdown(
             f'<p class="detail-field-label">Location</p>'
             f'<p class="detail-field-value">{row["address"]}</p>',

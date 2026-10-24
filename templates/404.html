@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 — Municipal Page Not Found | CivicPulse AI</title>
+    <meta name="description" content="The civic record or municipal page you requested could not be located.">
+    <meta name="robots" content="noindex, follow">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="alternate icon" type="image/x-icon" href="/favicon.ico">
+
+    <!-- Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-page: #f8fafc;
+            --surface: #ffffff;
+            --border: #e2e8f0;
+            --text-main: #0f172a;
+            --text-sub: #334155;
+            --text-muted: #475569;
+            --civic-green: #15803d;
+            --civic-blue: #1e40af;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            background-color: var(--bg-page);
+            color: var(--text-main);
+            font-family: 'Inter', -apple-system, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+        }
+        .error-card {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 3rem 2.5rem;
+            max-width: 580px;
+            width: 100%;
+            text-align: center;
+            box-shadow: 0 10px 25px rgba(15, 23, 42, 0.05);
+        }
+        .error-code {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 5rem;
+            font-weight: 800;
+            color: #dc2626;
+            line-height: 1;
+            margin-bottom: 0.75rem;
+        }
+        .error-title {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 0.75rem;
+        }
+        .error-desc {
+            color: var(--text-sub);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+        }
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0.75rem 1.4rem;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.92rem;
+            text-decoration: none;
+            transition: all 0.15s ease;
+        }
+        .btn-primary {
+            background: var(--civic-green);
+            color: #ffffff;
+            border: 1px solid var(--civic-green);
+        }
+        .btn-primary:hover {
+            background: #166534;
+        }
+        .btn-outline {
+            background: var(--surface);
+            color: var(--text-sub);
+            border: 1.5px solid var(--border);
+        }
+        .btn-outline:hover {
+            background: #f1f5f9;
+        }
+    </style>
+</head>
+<body>
+
+    <main class="error-card">
+        <div class="error-code">404</div>
+        <h1 class="error-title">Municipal Record Not Found</h1>
+        <p class="error-desc">
+            The civic route, ticket file, or municipal page you requested does not exist or may have been relocated during system maintenance.
+        </p>
+        <div class="btn-group">
+            <a href="/" class="btn btn-primary"><i class="fa-solid fa-house" aria-hidden="true"></i> Return to Citizen Portal</a>
+            <a href="/#dashboard-section" class="btn btn-outline"><i class="fa-solid fa-map" aria-hidden="true"></i> View Heatmap</a>
+            <a href="/privacy" class="btn btn-outline"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Privacy Policy</a>
+        </div>
+        <div style="margin-top:2rem; font-size:0.8rem; color:var(--text-muted);">
+            Emergency Helpline: <strong>1122</strong> | Municipal Grievance Cell: <strong>1339</strong>
+        </div>
+    </main>
+
+</body>
+</html>

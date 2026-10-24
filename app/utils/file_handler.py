@@ -1,8 +1,11 @@
+import logging
 import os
 import uuid
 from typing import Tuple, Set, Optional
 from fastapi import UploadFile, HTTPException, status
 from app.config import settings
+
+logger = logging.getLogger(__name__)
 
 # Strict MIME type allowlists
 ALLOWED_IMAGE_TYPES: Set[str] = {
@@ -121,6 +124,20 @@ async def save_uploaded_file(
                 buffer.write(chunk)
     finally:
         await file.seek(0)  # Reset file pointer if needed
+
+    # Image Optimization & Compression (Item 12)
+    if is_image and os.path.exists(destination_path):
+        try:
+            from PIL import Image
+            with Image.open(destination_path) as im:
+                if im.mode in ("RGBA", "P") and ext.lower() in [".jpg", ".jpeg"]:
+                    im = im.convert("RGB")
+                max_dim = 1920
+                if im.width > max_dim or im.height > max_dim:
+                    im.thumbnail((max_dim, max_dim), Image.Resampling.LANCZOS)
+                im.save(destination_path, optimize=True, quality=82)
+        except Exception as e:
+            logger.warning(f"Image compression skipped: {e}")
 
     # Normalize path with forward slashes for cross-platform compatibility
     return destination_path.replace("\\", "/")

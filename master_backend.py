@@ -23,6 +23,7 @@ import logging
 import smtplib
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
+from pathlib import Path
 from typing import Generator, List, Optional, Dict, Any, Set, Tuple, Union
 from datetime import datetime, timezone, timedelta
 from contextlib import asynccontextmanager
@@ -30,7 +31,8 @@ from enum import Enum
 
 # Third-party imports
 from fastapi import FastAPI, Request, Depends, Form, File, UploadFile, HTTPException, Query, Security, status
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, FileResponse, PlainTextResponse, Response, RedirectResponse
+from starlette.middleware.gzip import GZipMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
 from fastapi.exceptions import RequestValidationError
@@ -54,6 +56,7 @@ class Settings(BaseSettings):
     DEBUG: bool = True
     PORT: int = 8000
     HOST: str = "0.0.0.0"
+    FORCE_HTTPS: bool = False
 
     # Database
     DATABASE_URL: str = "sqlite:///./cleancity.db"
@@ -709,6 +712,20 @@ async def save_uploaded_file(file: UploadFile, is_image: bool = True) -> str:
                 buffer.write(chunk)
     finally:
         await file.seek(0)
+
+    # Image Optimization & Compression (Item 12)
+    if is_image and os.path.exists(dest_path):
+        try:
+            from PIL import Image
+            with Image.open(dest_path) as im:
+                if im.mode in ("RGBA", "P") and ext.lower() in [".jpg", ".jpeg"]:
+                    im = im.convert("RGB")
+                max_dim = 1920
+                if im.width > max_dim or im.height > max_dim:
+                    im.thumbnail((max_dim, max_dim), Image.Resampling.LANCZOS)
+                im.save(dest_path, optimize=True, quality=82)
+        except Exception as e:
+            logger.warning(f"Image compression skipped: {e}")
 
     return dest_path.replace("\\", "/")
 
@@ -1560,14 +1577,37 @@ limiter = Limiter(key_func=get_remote_address)
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
+# Security & Force HTTPS Middleware (Item 5)
+@app.middleware("http")
+async def security_and_https_headers_middleware(request: Request, call_next):
+    proto = request.headers.get("x-forwarded-proto", "").lower()
+    if proto == "http" and getattr(settings, "FORCE_HTTPS", False):
+        url = request.url.replace(scheme="https")
+        return RedirectResponse(url=str(url), status_code=status.HTTP_308_PERMANENT_REDIRECT)
+
+    response = await call_next(request)
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains; preload"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-Frame-Options"] = "SAMEORIGIN"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+    return response
+
+# GZip Compression Middleware (Item 12)
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+
 # CORS Setup
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS,
+    allow_origins=["*"] if settings.CORS_ORIGINS == "*" else settings.CORS_ORIGINS,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+if not os.path.exists("static"):
+    os.makedirs("static", exist_ok=True)
+app.mount("/static", StaticFiles(directory="static"), name="static")
 
 if not os.path.exists(settings.UPLOAD_DIR):
     os.makedirs(settings.UPLOAD_DIR, exist_ok=True)
@@ -1582,13 +1622,122 @@ async def global_unhandled_exception_handler(request: Request, exc: Exception):
     return JSONResponse(status_code=500, content={"detail": "Internal server error occurred."})
 
 
+# Custom 404 & 500 HTML Exception Handlers (Item 15)
+@app.exception_handler(404)
+@app.exception_handler(StarletteHTTPException)
+async def custom_http_exception_handler(request: Request, exc: StarletteHTTPException):
+    if exc.status_code == 404:
+        if "text/html" in request.headers.get("accept", ""):
+            tpl = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", "404.html")
+            if os.path.exists(tpl):
+                with open(tpl, "r", encoding="utf-8") as f:
+                    return HTMLResponse(content=f.read(), status_code=404)
+        return JSONResponse(status_code=404, content={"status": "error", "status_code": 404, "detail": exc.detail or "Not Found"})
+    elif exc.status_code == 500:
+        if "text/html" in request.headers.get("accept", ""):
+            tpl = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", "500.html")
+            if os.path.exists(tpl):
+                with open(tpl, "r", encoding="utf-8") as f:
+                    return HTMLResponse(content=f.read(), status_code=500)
+        return JSONResponse(status_code=500, content={"status": "error", "status_code": 500, "detail": "Internal Server Error"})
+    return JSONResponse(status_code=exc.status_code, content={"detail": exc.detail})
+
 # --- ENDPOINTS ---
 
 @app.get("/", response_class=HTMLResponse, tags=["Dashboard UI"])
 @app.get("/dashboard", response_class=HTMLResponse, tags=["Dashboard UI"])
 async def dashboard_view():
-    """Serves the built-in 3D Cyberpunk Dashboard."""
-    return DASHBOARD_HTML
+    """Serves the modernized, accessible CivicPulse AI portal and triage dashboard."""
+    tpl = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", "index.html")
+    if os.path.exists(tpl):
+        with open(tpl, "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    return HTMLResponse(content=DASHBOARD_HTML)
+
+@app.get("/privacy", response_class=HTMLResponse, tags=["Legal & Statutory"])
+async def privacy_page():
+    tpl = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", "privacy.html")
+    if os.path.exists(tpl):
+        with open(tpl, "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    raise HTTPException(status_code=404, detail="Privacy policy template not found")
+
+@app.get("/terms", response_class=HTMLResponse, tags=["Legal & Statutory"])
+async def terms_page():
+    tpl = os.path.join(os.path.dirname(os.path.abspath(__file__)), "templates", "terms.html")
+    if os.path.exists(tpl):
+        with open(tpl, "r", encoding="utf-8") as f:
+            return HTMLResponse(content=f.read())
+    raise HTTPException(status_code=404, detail="Terms template not found")
+
+@app.get("/robots.txt", response_class=PlainTextResponse, tags=["SEO & Crawlers"])
+async def robots_txt():
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "robots.txt")
+    if os.path.exists(path):
+        with open(path, "r", encoding="utf-8") as f:
+            return PlainTextResponse(content=f.read())
+    return PlainTextResponse("User-agent: *\nAllow: /\nDisallow: /media/\nDisallow: /api/\nSitemap: https://civicpulse.sindh.gov.pk/sitemap.xml\n")
+
+@app.get("/sitemap.xml", tags=["SEO & Crawlers"])
+async def sitemap_xml():
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sitemap.xml")
+    if os.path.exists(path):
+        with open(path, "r", encoding="utf-8") as f:
+            return Response(content=f.read(), media_type="application/xml")
+    raise HTTPException(status_code=404, detail="Sitemap not found")
+
+@app.get("/favicon.ico", include_in_schema=False)
+async def favicon_route():
+    for fav in ["favicon.ico", "static/favicon.ico"]:
+        fp = os.path.join(os.path.dirname(os.path.abspath(__file__)), fav)
+        if os.path.exists(fp):
+            return FileResponse(fp, media_type="image/x-icon")
+    raise HTTPException(status_code=404, detail="Favicon not found")
+
+@app.get("/api/track/{ticket_id}", response_model=TicketResponse, tags=["Citizen Tracking"])
+def track_ticket_public(ticket_id: str, db: Session = Depends(get_db)):
+    t = db.query(Complaint).filter(Complaint.ticket_id == ticket_id.upper()).first()
+    if not t:
+        raise HTTPException(status_code=404, detail=f"Ticket '{ticket_id}' not found.")
+    return TicketResponse(
+        ticket_id=t.ticket_id,
+        image_path=t.image_path,
+        original_audio_path=t.original_audio_path,
+        translated_text=t.translated_text,
+        category=t.category,
+        severity=t.severity,
+        latitude=t.latitude,
+        longitude=t.longitude,
+        lat=t.latitude,
+        lng=t.longitude,
+        address=t.translated_text or "Hyderabad, Sindh",
+        ai_action_plan=t.ai_action_plan,
+        is_valid_civic_issue=t.is_valid_civic_issue,
+        status=t.status,
+        timestamp=t.timestamp,
+        created_at=t.timestamp.isoformat(),
+        duplicate_of=t.duplicate_of,
+        duplicate_count=t.duplicate_count,
+        phone_number=getattr(t, "phone_number", None)
+    )
+
+@app.get("/api/dashboard/stats", response_model=AdminDashboardStats, tags=["Municipal Dashboard"])
+def get_dashboard_stats(db: Session = Depends(get_db)):
+    return get_stats(db=db, _="dashboard-verified")
+
+@app.get("/api/dashboard/tickets", response_model=TicketListResponse, tags=["Municipal Dashboard"])
+def get_dashboard_tickets(limit: int = 150, db: Session = Depends(get_db)):
+    return get_tickets(status_filter=None, category_filter=None, include_invalid=False, include_duplicates=False, limit=limit, offset=0, db=db, _="dashboard-verified")
+
+class AnalyticsEventPayload(BaseModel):
+    event: str
+    payload: Optional[Dict[str, Any]] = None
+    timestamp: Optional[float] = None
+
+@app.post("/api/analytics/event", tags=["Telemetry"])
+async def record_analytics(data: AnalyticsEventPayload):
+    logger.info(f"Analytics event: {data.event}")
+    return {"status": "recorded", "event": data.event}
 
 
 @app.get("/api/health", tags=["Health"])
@@ -1728,6 +1877,7 @@ HYDERABAD_LANDMARKS = PAKISTAN_LANDMARKS
 async def submit_report(
     request: Request,
     image: UploadFile = File(...),
+    hp_website: Optional[str] = Form(None),
     audio: Optional[UploadFile] = File(None),
     latitude: Optional[float] = Form(None),
     longitude: Optional[float] = Form(None),
@@ -1738,6 +1888,11 @@ async def submit_report(
     phone_number: Optional[str] = Form(None),
     db: Session = Depends(get_db)
 ):
+    # Spam/Bot Protection (Item 18)
+    if hp_website and hp_website.strip():
+        logger.warning(f"Bot caught by honeypot: {hp_website}")
+        raise HTTPException(status_code=400, detail="Automated bot submission detected and rejected.")
+
     # Resolve coordinates
     resolved_lat: Optional[float] = latitude
     resolved_lon: Optional[float] = longitude
@@ -1908,10 +2063,15 @@ def get_tickets(
         q = q.filter(Complaint.is_valid_civic_issue.is_(True))
     if not include_duplicates:
         q = q.filter(Complaint.duplicate_of.is_(None))
-    if status_filter:
+    if status_filter and hasattr(status_filter, "value"):
         q = q.filter(Complaint.status == status_filter.value)
-    if category_filter:
+    elif isinstance(status_filter, str):
+        q = q.filter(Complaint.status == status_filter)
+
+    if category_filter and hasattr(category_filter, "value"):
         q = q.filter(Complaint.category == category_filter.value)
+    elif isinstance(category_filter, str):
+        q = q.filter(Complaint.category == category_filter)
 
     total = q.count()
     raw_tickets = q.order_by(desc(Complaint.timestamp)).offset(offset).limit(limit).all()

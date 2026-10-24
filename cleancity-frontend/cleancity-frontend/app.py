@@ -890,4 +890,17 @@ with tab_privacy:
     )
 
 st.divider()
-st.caption("CivicPulse AI · Municipal Governance Platform · Government of Sindh (Karachi & Hyderabad) · 2026")
+col_f1, col_f2 = st.columns([2, 1])
+with col_f1:
+    st.caption("CivicPulse AI · Municipal Governance Platform · Government of Sindh (Karachi & Hyderabad) · 2026")
+with col_f2:
+    st.markdown(
+        """
+        <div style="font-size:0.82rem; text-align:right;">
+            <a href="http://127.0.0.1:8000/privacy" target="_blank" style="color:#15803D; text-decoration:none; font-weight:600;">🔒 Privacy Policy</a> &nbsp;|&nbsp;
+            <a href="http://127.0.0.1:8000/terms" target="_blank" style="color:#15803D; text-decoration:none; font-weight:600;">⚖️ Terms & Conditions</a> &nbsp;|&nbsp;
+            <a href="http://127.0.0.1:8000/" target="_blank" style="color:#15803D; text-decoration:none; font-weight:600;">🏙️ Web Portal</a>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )

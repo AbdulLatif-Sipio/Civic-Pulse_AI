@@ -160,3 +160,22 @@ def update_ticket_status(
         duplicate_of=ticket.duplicate_of,
         duplicate_count=ticket.duplicate_count
     )
+
+
+@router.get(
+    "/track/{ticket_id}",
+    response_model=TicketResponse,
+    summary="Public Citizen Complaint Tracking",
+    description="Allows citizens to check real-time status of their grievance by tracking code without authentication."
+)
+async def track_ticket_public(
+    ticket_id: str,
+    db: Session = Depends(get_db)
+):
+    ticket = db.query(Complaint).filter(Complaint.ticket_id == ticket_id.upper()).first()
+    if not ticket:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Civic ticket '{ticket_id}' not found."
+        )
+    return ticket

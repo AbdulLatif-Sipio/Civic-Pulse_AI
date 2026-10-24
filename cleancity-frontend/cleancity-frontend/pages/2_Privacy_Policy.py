@@ -194,5 +194,14 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
+
+col_p1, col_p2 = st.columns(2)
+with col_p1:
+    if st.button("⬅️ Return to Citizen Portal", type="primary"):
+        st.switch_page("app.py")
+with col_p2:
+    if st.button("⚖️ View Terms and Conditions", type="secondary"):
+        st.switch_page("pages/3_Terms_and_Conditions.py")
+
 st.divider()
 st.caption("CivicPulse AI · Government of Sindh Municipal Services · Data Protection Officer (DPO) Reg: PK-SND-2026-CC")
