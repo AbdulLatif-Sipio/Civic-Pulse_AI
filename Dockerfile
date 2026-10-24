@@ -17,7 +17,8 @@ COPY . .
 
 # Ensure storage directories exist and entrypoint has executable permissions
 RUN mkdir -p data media/images media/audio static templates \
-    && chmod +x docker-entrypoint.sh
+    && chmod +x docker-entrypoint.sh \
+    && chmod -R 777 /app
 
 # Expose ports: 8000 (Backend API & Web Portal), 8501 (Streamlit)
 EXPOSE 8000 8501
