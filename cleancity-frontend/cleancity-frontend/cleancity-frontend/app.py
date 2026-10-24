@@ -29,9 +29,10 @@ st.markdown(
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
 
     /* ── Base Theme & Typography (Clean Municipal Light) ── */
-    html, body, [class*="css"] {
+    html, body, [class*="css"], .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"], section.main, .main {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        background-color: #F8FAFC !important;
+        background-color: #FFFFFF !important;
+        background: #FFFFFF !important;
         color: #0F172A !important;
     }
     .main .block-container {
@@ -61,7 +62,7 @@ st.markdown(
 
     /* ── Top Municipal Notice Bar ── */
     .muni-topbar {
-        background: #F1F5F9;
+        background: #FFFFFF;
         border: 1px solid #E2E8F0;
         border-radius: 8px;
         padding: 0.65rem 1.1rem;
@@ -129,7 +130,7 @@ st.markdown(
 
     /* ── File Uploader ── */
     div[data-testid="stFileUploader"] {
-        background: #F8FAFC;
+        background: #FFFFFF;
         border: 1px dashed #CBD5E1;
         border-radius: 8px;
         padding: 1rem;
@@ -169,7 +170,7 @@ st.markdown(
 
     /* ── Audio Input ── */
     div[data-testid="stAudioInput"] {
-        background: #F8FAFC;
+        background: #FFFFFF;
         border: 1px solid #E2E8F0;
         border-radius: 8px;
         padding: 0.6rem 0.9rem;
@@ -241,7 +242,7 @@ st.markdown(
 
     /* ── Tabs Styling ── */
     div[data-baseweb="tab-list"] {
-        background-color: #F1F5F9;
+        background-color: #FFFFFF;
         border: 1px solid #E2E8F0;
         gap: 6px;
         padding: 5px;
@@ -264,7 +265,7 @@ st.markdown(
 
     /* ── Info & Cards ── */
     .info-card {
-        background: #F8FAFC;
+        background: #FFFFFF;
         border: 1px solid #E2E8F0;
         border-radius: 8px;
         padding: 1.2rem;

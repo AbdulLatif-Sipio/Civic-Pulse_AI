@@ -22,9 +22,10 @@ st.markdown(
     @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
 
     /* ── Base Light Theme ── */
-    html, body, [class*="css"] {
+    html, body, [class*="css"], .stApp, [data-testid="stAppViewContainer"], [data-testid="stHeader"], section.main, .main {
         font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        background-color: #F8FAFC !important;
+        background-color: #FFFFFF !important;
+        background: #FFFFFF !important;
         color: #0F172A !important;
     }
     .main .block-container {
@@ -48,7 +49,7 @@ st.markdown(
 
     /* ── Sidebar ── */
     section[data-testid="stSidebar"] {
-        background-color: #F8FAFC !important;
+        background-color: #FFFFFF !important;
         border-right: 1px solid #E2E8F0;
     }
     section[data-testid="stSidebar"] * { color: #334155 !important; }
@@ -107,7 +108,7 @@ st.markdown(
 
     /* ── Metric cards ── */
     div[data-testid="stMetric"] {
-        background: #F8FAFC;
+        background: #FFFFFF;
         border: 1px solid #E2E8F0;
         border-radius: 8px;
         padding: 1.2rem 1.4rem 1rem 1.4rem;
