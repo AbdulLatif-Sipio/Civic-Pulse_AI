@@ -1,3 +1,13 @@
+---
+title: CivicPulse AI - CleanCity Copilot
+emoji: 🏛️
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_port: 8000
+pinned: false
+---
+
 # 🚀 CleanCity Copilot — Unified Backend Engine & Built-in 3D UI
 
 CleanCity Copilot is an AI-assisted civic issue triage and routing engine built for the **Alibaba Cloud AI Hackathon 2026**.
